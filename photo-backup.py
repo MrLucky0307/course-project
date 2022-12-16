@@ -21,16 +21,13 @@ class VkUser:
         self.token = token
         self.version = version
         self.owner_id = []
+        self.profile_photos = []
         self.user_id = input('Введите id vk: ')
 
     # Получение информации о профиле
     def get_profile_info(self):
         url = self.url + 'account.getProfileInfo'
-        profile_info_params = {
-            'account': self.user_id,
-            'access_token': self.token,
-            'v': self.version
-        }
+        profile_info_params = {'access_token': self.token, 'v': self.version}
         req = requests.get(url, params={**self.params, **profile_info_params}).json()
         self.owner_id = req['response']['id']
         first_name = req['response']['first_name']
@@ -51,13 +48,14 @@ class VkUser:
             'v': self.version
         }
         req = requests.get(url, params={**self.params, **profile_photos_params}).json()
+        self.profile_photos = req['response']['items']
         return req['response']['items']
 
     # Получение ссылок на максимальный размер фотографий
     def get_url_max_size_photos(self):
         max_size_photos = list()
         max_size_photos_url = list()
-        for photo in self.get_profile_photos():
+        for photo in self.profile_photos:
             max_size_photos.append(photo['sizes'][-1])
         for item in max_size_photos:
             max_size_photos_url.append(item['url'])
@@ -66,7 +64,7 @@ class VkUser:
     # Получение списка имен фотографий
     def get_photo_names(self):
         photo_names = list()
-        for photo in self.get_profile_photos():
+        for photo in self.profile_photos:
             old_date = datetime.datetime.fromtimestamp(photo['date'])
             str_date = old_date.strftime('%Y-%m-%d')
             photo_names.append(str(photo['likes']['count']) + '_' + str(str_date) + '.jpg')
@@ -76,7 +74,7 @@ class VkUser:
     def get_photo_max_size(self):
         max_size_photos_info = list()
         max_size_photos = list()
-        for photo in self.get_profile_photos():
+        for photo in self.profile_photos:
             max_size_photos_info.append(photo['sizes'][-1])
         for item in max_size_photos_info:
             max_size_photos.append(item['type'])
