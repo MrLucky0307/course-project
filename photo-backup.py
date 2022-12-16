@@ -49,7 +49,7 @@ class VkUser:
         }
         req = requests.get(url, params={**self.params, **profile_photos_params}).json()
         self.profile_photos = req['response']['items']
-        return req['response']['items']
+        return self.profile_photos
 
     # Получение ссылок на максимальный размер фотографий
     def get_url_max_size_photos(self):
